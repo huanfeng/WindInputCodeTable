@@ -1,0 +1,41 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "schemas/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build release assets
+        working-directory: scripts
+        run: go run build.go
+
+      - name: Generate release tag
+        id: tag
+        run: echo "tag=release-$(date -u +%Y%m%d-%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "词库更新 ${{ steps.tag.outputs.tag }}"
+          body: |
+            自动构建的第三方词库发布包。
+
+            客户端请下载 `index.json` 获取方案清单，再根据清单下载对应的 zip 包。
+          files: dist/*
+          make_latest: true

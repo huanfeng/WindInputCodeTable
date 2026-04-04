@@ -1,0 +1,47 @@
+schema:
+  id: jjm
+  name: "晶晶码"
+  icon_label: "晶"
+  version: "1.0"
+  author: "内置"
+  description: "晶晶码输入方案"
+
+engine:
+  type: codetable
+  codetable:
+    max_code_length: 4
+    auto_commit_unique: false
+    clear_on_empty_max: false
+    top_code_commit: true
+    punct_commit: true
+    show_code_hint: true
+    single_code_input: false
+    candidate_sort_mode: frequency
+    temp_pinyin:
+      enabled: true
+      schema: pinyin
+  filter_mode: smart
+
+dictionaries:
+  - id: jjm_main
+    path: "jjm/jjm.dict.yaml"
+    type: rime_codetable
+    default: true
+
+user_data:
+  shadow_file: "jjm.shadow.yaml"
+  user_dict_file: "jjm.userwords.txt"
+
+learning:
+  mode: manual
+  protect_top_n: 3
+
+encoder:
+  max_word_length: 10
+  rules:
+    - length_equal: 2
+      formula: "AaAbBaBb"
+    - length_equal: 3
+      formula: "AaAbBaCa"
+    - length_in_range: [4, 10]
+      formula: "AaBaCaDa"

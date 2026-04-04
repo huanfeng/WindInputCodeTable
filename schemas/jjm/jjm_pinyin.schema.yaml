@@ -1,0 +1,23 @@
+schema:
+  id: jjm_pinyin
+  name: "晶晶码拼音"
+  icon_label: "晶"
+  version: "1.0"
+  author: "内置"
+  description: "晶晶码+拼音混合输入方案，晶晶码优先，拼音补充"
+
+engine:
+  type: mixed
+  mixed:
+    primary_schema: jjm
+    secondary_schema: pinyin
+    min_pinyin_length: 2
+    codetable_weight_boost: 10000000
+    show_source_hint: true
+  filter_mode: smart
+
+learning:
+  mode: frequency
+  protect_top_n: 3
+  temp_max_entries: 5000
+  temp_promote_count: 3

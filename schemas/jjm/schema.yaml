@@ -1,0 +1,17 @@
+id: jjm
+name: "晶晶码"
+version: "1.0.0"
+author: "内置"
+description: "晶晶码输入方案，支持纯码表和拼音混合两种模式"
+category: "xingma"
+icon_label: "晶"
+min_app_version: "1.0.0"
+
+variants:
+  - id: jjm
+    name: "晶晶码（纯码表）"
+    schema_file: "jjm.schema.yaml"
+    default: true
+  - id: jjm_pinyin
+    name: "晶晶码+拼音混合"
+    schema_file: "jjm_pinyin.schema.yaml"
