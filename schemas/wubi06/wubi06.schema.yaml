@@ -1,30 +1,33 @@
 schema:
-  id: jjm
-  name: "晶晶码"
-  icon_label: "晶"
+  id: wubi06
+  name: "五笔06"
+  icon_label: "五"
   version: "1.0"
   author: "群友"
-  description: "晶晶码输入方案"
+  description: "五笔06版输入方案"
 
 engine:
   type: codetable
   codetable:
-    max_code_length: 4
     auto_commit_unique: false
+    candidate_sort_mode: frequency
     clear_on_empty_max: false
-    top_code_commit: true
+    dedup_candidates: true
+    max_code_length: 4
     punct_commit: true
     show_code_hint: true
     single_code_input: false
-    candidate_sort_mode: frequency
+    skip_single_char_freq: true
     temp_pinyin:
       enabled: true
       schema: pinyin
+    top_code_commit: true
+    z_key_repeat: true
   filter_mode: smart
 
 dictionaries:
-  - id: jjm_main
-    path: "jjm/jjm.dict.yaml"
+  - id: wubi06_main
+    path: "wubi06/wubi06_cidian.dict.yaml"
     type: rime_codetable
     default: true
 
@@ -34,13 +37,3 @@ learning:
   freq:
     enabled: false
     protect_top_n: 3
-
-encoder:
-  max_word_length: 10
-  rules:
-    - length_equal: 2
-      formula: "AaAbBaBb"
-    - length_equal: 3
-      formula: "AaAbBaCa"
-    - length_in_range: [4, 10]
-      formula: "AaBaCaDa"
