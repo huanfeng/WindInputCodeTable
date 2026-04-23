@@ -1,10 +1,10 @@
 schema:
-  id: jjm
-  name: "晶晶码"
-  icon_label: "晶"
+  id: fysxm
+  name: "飞鹰声形码"
+  icon_label: "飞"
   version: "1.0"
   author: "群友"
-  description: "晶晶码输入方案"
+  description: "飞鹰声形码输入方案"
 
 engine:
   type: codetable
@@ -23,8 +23,8 @@ engine:
   filter_mode: smart
 
 dictionaries:
-  - id: jjm_main
-    path: "jjm/jjm.dict.yaml"
+  - id: fysxm_main
+    path: "fysxm/fysxm.dict.yaml"
     type: rime_codetable
     default: true
 

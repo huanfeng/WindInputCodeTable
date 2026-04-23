@@ -1,10 +1,10 @@
 schema:
-  id: jjm
-  name: "晶晶码"
-  icon_label: "晶"
+  id: tiger
+  name: "虎字"
+  icon_label: "字"
   version: "1.0"
   author: "群友"
-  description: "晶晶码输入方案"
+  description: "虎字秃版输入方案"
 
 engine:
   type: codetable
@@ -12,21 +12,28 @@ engine:
     max_code_length: 4
     auto_commit_unique: false
     clear_on_empty_max: false
+    # dedup_candidates: true
     top_code_commit: true
     punct_commit: true
     show_code_hint: true
     single_code_input: false
     candidate_sort_mode: frequency
+    z_key_repeat: true
     temp_pinyin:
       enabled: true
       schema: pinyin
   filter_mode: smart
 
 dictionaries:
-  - id: jjm_main
-    path: "jjm/jjm.dict.yaml"
+  - id: tiger_main
+    path: "tiger/tiger.dict.yaml"
     type: rime_codetable
     default: true
+    weight_spec:
+      median: 10
+      max: 890
+      min: 5
+      mode: linear
 
 learning:
   auto_learn:
@@ -41,6 +48,6 @@ encoder:
     - length_equal: 2
       formula: "AaAbBaBb"
     - length_equal: 3
-      formula: "AaAbBaCa"
+      formula: "AaBaCaCb"
     - length_in_range: [4, 10]
-      formula: "AaBaCaDa"
+      formula: "AaBaCaZa"
