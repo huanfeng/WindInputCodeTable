@@ -2,12 +2,14 @@ package main
 
 import (
 	"archive/zip"
+	"bufio"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -19,6 +21,7 @@ type SchemaYAML struct {
 	Name          string    `yaml:"name" json:"name"`
 	Version       string    `yaml:"version" json:"version"`
 	Author        string    `yaml:"author" json:"author"`
+	Source        string    `yaml:"source" json:"source"`
 	Description   string    `yaml:"description" json:"description"`
 	Category      string    `yaml:"category" json:"category"`
 	IconLabel     string    `yaml:"icon_label" json:"icon_label"`
@@ -45,6 +48,7 @@ type SchemaEntry struct {
 	Name          string    `json:"name"`
 	Version       string    `json:"version"`
 	Author        string    `json:"author"`
+	Source        string    `json:"source"`
 	Description   string    `json:"description"`
 	Category      string    `json:"category"`
 	IconLabel     string    `json:"icon_label"`
@@ -99,7 +103,7 @@ func main() {
 		}
 
 		// 校验必填字段
-		if err := validateSchema(meta); err != nil {
+		if err := validateSchema(meta, schemaDir); err != nil {
 			fatal("校验 %s 失败: %v", entry.Name(), err)
 		}
 
@@ -131,6 +135,7 @@ func main() {
 			Name:          meta.Name,
 			Version:       meta.Version,
 			Author:        meta.Author,
+			Source:        meta.Source,
 			Description:   meta.Description,
 			Category:      meta.Category,
 			IconLabel:     meta.IconLabel,
@@ -179,7 +184,7 @@ func parseSchemaYAML(path string) (*SchemaYAML, error) {
 	return &meta, nil
 }
 
-func validateSchema(meta *SchemaYAML) error {
+func validateSchema(meta *SchemaYAML, schemaDir string) error {
 	if meta.ID == "" {
 		return fmt.Errorf("缺少 id")
 	}
@@ -192,10 +197,206 @@ func validateSchema(meta *SchemaYAML) error {
 	if meta.Author == "" {
 		return fmt.Errorf("缺少 author")
 	}
+	if meta.Source == "" {
+		return fmt.Errorf("缺少 source")
+	}
+	if meta.Description == "" {
+		return fmt.Errorf("缺少 description")
+	}
+	if meta.Category == "" {
+		return fmt.Errorf("缺少 category")
+	}
+	if meta.IconLabel == "" {
+		return fmt.Errorf("缺少 icon_label")
+	}
+	if meta.MinAppVersion == "" {
+		return fmt.Errorf("缺少 min_app_version")
+	}
 	if len(meta.Variants) == 0 {
 		return fmt.Errorf("缺少 variants")
 	}
+
+	if !isValidCategory(meta.Category) {
+		return fmt.Errorf("category 非法: %s", meta.Category)
+	}
+	if len([]rune(meta.IconLabel)) != 1 {
+		return fmt.Errorf("icon_label 必须为单个字符: %q", meta.IconLabel)
+	}
+
+	defaultCount := 0
+	seenVariantIDs := make(map[string]bool)
+	for i, variant := range meta.Variants {
+		if variant.ID == "" {
+			return fmt.Errorf("variants[%d] 缺少 id", i)
+		}
+		if variant.Name == "" {
+			return fmt.Errorf("variants[%d] 缺少 name", i)
+		}
+		if variant.SchemaFile == "" {
+			return fmt.Errorf("variants[%d] 缺少 schema_file", i)
+		}
+		if seenVariantIDs[variant.ID] {
+			return fmt.Errorf("variants[%d] id 重复: %s", i, variant.ID)
+		}
+		seenVariantIDs[variant.ID] = true
+		if variant.Default {
+			defaultCount++
+		}
+		if err := validateVariantFile(schemaDir, variant); err != nil {
+			return err
+		}
+	}
+	if defaultCount != 1 {
+		return fmt.Errorf("variants 必须且只能有一个 default=true，当前为 %d", defaultCount)
+	}
 	return nil
+}
+
+type variantFile struct {
+	Schema struct {
+		ID     string `yaml:"id"`
+		Name   string `yaml:"name"`
+		Author string `yaml:"author"`
+	} `yaml:"schema"`
+	Engine struct {
+		Type  string `yaml:"type"`
+		Mixed struct {
+			PrimarySchema   string `yaml:"primary_schema"`
+			SecondarySchema string `yaml:"secondary_schema"`
+		} `yaml:"mixed"`
+	} `yaml:"engine"`
+	Dictionaries []variantDict `yaml:"dictionaries"`
+}
+
+type variantDict struct {
+	Path string `yaml:"path"`
+	Type string `yaml:"type"`
+}
+
+func validateVariantFile(schemaDir string, variant Variant) error {
+	path := filepath.Join(schemaDir, variant.SchemaFile)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("读取 %s 失败: %w", variant.SchemaFile, err)
+	}
+
+	var vf variantFile
+	if err := yaml.Unmarshal(data, &vf); err != nil {
+		return fmt.Errorf("解析 %s 失败: %w", variant.SchemaFile, err)
+	}
+
+	if vf.Schema.ID != variant.ID {
+		return fmt.Errorf("%s 的 schema.id 必须与 variant.id 一致: %s != %s", variant.SchemaFile, vf.Schema.ID, variant.ID)
+	}
+	if vf.Schema.Name == "" {
+		return fmt.Errorf("%s 缺少 schema.name", variant.SchemaFile)
+	}
+	if vf.Schema.Author == "" {
+		return fmt.Errorf("%s 缺少 schema.author", variant.SchemaFile)
+	}
+	if !isValidEngineType(vf.Engine.Type) {
+		return fmt.Errorf("%s 的 engine.type 非法: %s", variant.SchemaFile, vf.Engine.Type)
+	}
+
+	hasMixedRef := vf.Engine.Type == "mixed" && (vf.Engine.Mixed.PrimarySchema != "" || vf.Engine.Mixed.SecondarySchema != "")
+	if len(vf.Dictionaries) == 0 && !hasMixedRef {
+		return fmt.Errorf("%s 缺少 dictionaries", variant.SchemaFile)
+	}
+
+	for i, dict := range vf.Dictionaries {
+		if dict.Path == "" {
+			return fmt.Errorf("%s 的 dictionaries[%d].path 不能为空", variant.SchemaFile, i)
+		}
+		if !isValidDictType(dict.Type) {
+			return fmt.Errorf("%s 的 dictionaries[%d].type 非法: %s", variant.SchemaFile, i, dict.Type)
+		}
+
+		dictPath := filepath.Join(schemaDir, filepath.FromSlash(dict.Path))
+		if _, err := os.Stat(dictPath); err != nil {
+			return fmt.Errorf("%s 引用的词典不存在: %s", variant.SchemaFile, dict.Path)
+		}
+
+		if dict.Type == "rime_codetable" || dict.Type == "rime_pinyin" {
+			if err := validateRimeImports(dictPath); err != nil {
+				return fmt.Errorf("%s 校验 import_tables 失败: %w", dict.Path, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func validateRimeImports(dictPath string) error {
+	imports, err := parseRimeImportTables(dictPath)
+	if err != nil {
+		return err
+	}
+
+	dir := filepath.Dir(dictPath)
+	for _, name := range imports {
+		importPath := filepath.Join(dir, filepath.FromSlash(name+".dict.yaml"))
+		if _, err := os.Stat(importPath); err != nil {
+			return fmt.Errorf("缺少 import_tables 词典 %s", filepath.ToSlash(filepath.Join(filepath.Base(dir), name+".dict.yaml")))
+		}
+	}
+
+	return nil
+}
+
+func parseRimeImportTables(path string) ([]string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var headerLines []string
+	scanner := bufio.NewScanner(strings.NewReader(string(data)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		headerLines = append(headerLines, line)
+		if strings.TrimSpace(line) == "..." {
+			break
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	var header struct {
+		ImportTables []string `yaml:"import_tables"`
+	}
+	if err := yaml.Unmarshal([]byte(strings.Join(headerLines, "\n")), &header); err != nil {
+		return nil, err
+	}
+
+	return header.ImportTables, nil
+}
+
+func isValidCategory(category string) bool {
+	switch category {
+	case "xingma", "wubi", "shuangpin", "pinyin", "other":
+		return true
+	default:
+		return false
+	}
+}
+
+func isValidEngineType(engineType string) bool {
+	switch engineType {
+	case "codetable", "pinyin", "mixed":
+		return true
+	default:
+		return false
+	}
+}
+
+func isValidDictType(dictType string) bool {
+	switch dictType {
+	case "codetable", "rime_codetable", "rime_pinyin":
+		return true
+	default:
+		return false
+	}
 }
 
 // collectFiles 收集方案目录中需要打包的文件（排除 schema.yaml 元信息）

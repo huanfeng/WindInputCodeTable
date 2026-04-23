@@ -1,10 +1,10 @@
 schema:
-  id: jjm
-  name: "晶晶码"
-  icon_label: "晶"
+  id: zm
+  name: "朕码"
+  icon_label: "朕"
   version: "1.0"
   author: "群友"
-  description: "晶晶码输入方案"
+  description: "朕码输入方案"
 
 engine:
   type: codetable
@@ -23,8 +23,8 @@ engine:
   filter_mode: smart
 
 dictionaries:
-  - id: jjm_main
-    path: "jjm/jjm.dict.yaml"
+  - id: zm_main
+    path: "zm/zm.dict.yaml"
     type: rime_codetable
     default: true
 

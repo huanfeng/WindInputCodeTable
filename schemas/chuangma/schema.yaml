@@ -1,0 +1,18 @@
+id: chuangma
+name: "创码"
+version: "1.0.0"
+author: "群友"
+source: "群友"
+description: "创码输入方案，支持纯码表和拼音混合两种模式"
+category: "xingma"
+icon_label: "创"
+min_app_version: "1.0.0"
+
+variants:
+  - id: chuangma
+    name: "创码（纯码表）"
+    schema_file: "chuangma.schema.yaml"
+    default: true
+  - id: chuangma_pinyin
+    name: "创码+拼音混合"
+    schema_file: "chuangma_pinyin.schema.yaml"

@@ -1,0 +1,18 @@
+id: tiger
+name: "虎字"
+version: "1.0.0"
+author: "群友"
+source: "群友"
+description: "虎字输入方案，支持纯码表和拼音混合两种模式"
+category: "xingma"
+icon_label: "字"
+min_app_version: "1.0.0"
+
+variants:
+  - id: tiger
+    name: "虎字（纯码表）"
+    schema_file: "tiger.schema.yaml"
+    default: true
+  - id: tiger_pinyin
+    name: "虎字+拼音混合"
+    schema_file: "tiger_pinyin.schema.yaml"
