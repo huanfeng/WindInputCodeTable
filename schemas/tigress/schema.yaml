@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: tigress
     name: "虎词（纯码表）"
-    schema_file: "tigress.schema.yaml"
+    schema_file: "tigress.schema.toml"
     default: true
   - id: tigress_pinyin
     name: "虎词+拼音混合"
-    schema_file: "tigress_pinyin.schema.yaml"
+    schema_file: "tigress_pinyin.schema.toml"

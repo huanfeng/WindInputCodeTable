@@ -43,7 +43,7 @@ GET {zip 的 browser_download_url}
 schemas/
 └── {方案ID}/
     ├── schema.yaml           # 方案元信息（作者维护，不会打包）
-    ├── {id}.schema.yaml      # 方案配置文件
+    ├── {id}.schema.toml      # 方案配置文件（TOML，与主程序 data/schemas/*.schema.toml 同构）
     └── {id}/
         └── {id}.dict.yaml    # 词典文件（Rime 格式）
 ```
@@ -74,13 +74,13 @@ min_app_version: "1.0.0"
 variants:
   - id: your_schema_id
     name: "变体名称"
-    schema_file: "your_schema_id.schema.yaml"
+    schema_file: "your_schema_id.schema.toml"
     default: true
 ```
 
 ### 3. 添加方案文件
 
-- `.schema.yaml` — 方案引擎配置
+- `.schema.toml` — 方案引擎配置（TOML；行为/调频/临时拼音等用户可配项由主程序全局 `[schema.codetable]`/`[schema.mix]` 提供，方案文件只写引擎固定参数）
 - `dicts/*.dict.yaml` — Rime 格式词典文件
 
 ### 4. 提交 PR

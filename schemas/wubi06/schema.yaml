@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: wubi06
     name: "五笔06（纯码表）"
-    schema_file: "wubi06.schema.yaml"
+    schema_file: "wubi06.schema.toml"
     default: true
   - id: wubi06_pinyin
     name: "五笔06+拼音混合"
-    schema_file: "wubi06_pinyin.schema.yaml"
+    schema_file: "wubi06_pinyin.schema.toml"

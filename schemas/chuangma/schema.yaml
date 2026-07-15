@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: chuangma
     name: "创码（纯码表）"
-    schema_file: "chuangma.schema.yaml"
+    schema_file: "chuangma.schema.toml"
     default: true
   - id: chuangma_pinyin
     name: "创码+拼音混合"
-    schema_file: "chuangma_pinyin.schema.yaml"
+    schema_file: "chuangma_pinyin.schema.toml"

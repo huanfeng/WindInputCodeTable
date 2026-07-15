@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: tiger
     name: "虎字（纯码表）"
-    schema_file: "tiger.schema.yaml"
+    schema_file: "tiger.schema.toml"
     default: true
   - id: tiger_pinyin
     name: "虎字+拼音混合"
-    schema_file: "tiger_pinyin.schema.yaml"
+    schema_file: "tiger_pinyin.schema.toml"

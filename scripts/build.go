@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"gopkg.in/yaml.v3"
 )
 
@@ -254,23 +255,23 @@ func validateSchema(meta *SchemaYAML, schemaDir string) error {
 
 type variantFile struct {
 	Schema struct {
-		ID     string `yaml:"id"`
-		Name   string `yaml:"name"`
-		Author string `yaml:"author"`
-	} `yaml:"schema"`
+		ID     string `toml:"id"`
+		Name   string `toml:"name"`
+		Author string `toml:"author"`
+	} `toml:"schema"`
 	Engine struct {
-		Type  string `yaml:"type"`
+		Type  string `toml:"type"`
 		Mixed struct {
-			PrimarySchema   string `yaml:"primary_schema"`
-			SecondarySchema string `yaml:"secondary_schema"`
-		} `yaml:"mixed"`
-	} `yaml:"engine"`
-	Dictionaries []variantDict `yaml:"dictionaries"`
+			PrimarySchema   string `toml:"primary_schema"`
+			SecondarySchema string `toml:"secondary_schema"`
+		} `toml:"mixed"`
+	} `toml:"engine"`
+	Dictionaries []variantDict `toml:"dictionaries"`
 }
 
 type variantDict struct {
-	Path string `yaml:"path"`
-	Type string `yaml:"type"`
+	Path string `toml:"path"`
+	Type string `toml:"type"`
 }
 
 func validateVariantFile(schemaDir string, variant Variant) error {
@@ -281,7 +282,7 @@ func validateVariantFile(schemaDir string, variant Variant) error {
 	}
 
 	var vf variantFile
-	if err := yaml.Unmarshal(data, &vf); err != nil {
+	if err := toml.Unmarshal(data, &vf); err != nil {
 		return fmt.Errorf("解析 %s 失败: %w", variant.SchemaFile, err)
 	}
 

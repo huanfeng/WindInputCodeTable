@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: jjm
     name: "晶晶码（纯码表）"
-    schema_file: "jjm.schema.yaml"
+    schema_file: "jjm.schema.toml"
     default: true
   - id: jjm_pinyin
     name: "晶晶码+拼音混合"
-    schema_file: "jjm_pinyin.schema.yaml"
+    schema_file: "jjm_pinyin.schema.toml"

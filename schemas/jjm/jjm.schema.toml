@@ -1,0 +1,36 @@
+[schema]
+id = "jjm"
+name = "晶晶码"
+icon_label = "晶"
+version = "1.0"
+author = "群友"
+description = "晶晶码输入方案"
+
+[engine]
+type = "codetable"
+
+# 仅引擎固定参数；行为/调频/造词/临时拼音等用户可配项走全局 [schema.codetable] 与 [input.temp_pinyin]。
+[engine.codetable]
+max_code_length = 4
+base_sort = "weight"
+
+[[dictionaries]]
+id = "jjm_main"
+path = "jjm/jjm.dict.yaml"
+type = "rime_codetable"
+default = true
+
+[encoder]
+max_word_length = 10
+
+[[encoder.rules]]
+length_equal = 2
+formula = "AaAbBaBb"
+
+[[encoder.rules]]
+length_equal = 3
+formula = "AaAbBaCa"
+
+[[encoder.rules]]
+length_in_range = [4, 10]
+formula = "AaBaCaDa"

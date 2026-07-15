@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: zm
     name: "朕码（纯码表）"
-    schema_file: "zm.schema.yaml"
+    schema_file: "zm.schema.toml"
     default: true
   - id: zm_pinyin
     name: "朕码+拼音混合"
-    schema_file: "zm_pinyin.schema.yaml"
+    schema_file: "zm_pinyin.schema.toml"

@@ -1,0 +1,16 @@
+[schema]
+id = "tigress_pinyin"
+name = "虎词拼音"
+icon_label = "中"
+version = "1.0"
+author = "群友"
+description = "虎词+拼音混合输入方案，虎词优先，拼音补充"
+
+[engine]
+type = "mixed"
+
+# 仅引擎固定参数（方案构成 + 内部权重基线）；融合策略走全局 [schema.mix]。
+[engine.mixed]
+primary_schema = "tigress"
+secondary_schema = "pinyin"
+codetable_weight_boost = 10000000

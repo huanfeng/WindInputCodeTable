@@ -11,8 +11,8 @@ min_app_version: "1.0.0"
 variants:
   - id: fysxm
     name: "飞鹰声形码（纯码表）"
-    schema_file: "fysxm.schema.yaml"
+    schema_file: "fysxm.schema.toml"
     default: true
   - id: fysxm_pinyin
     name: "飞鹰声形码+拼音混合"
-    schema_file: "fysxm_pinyin.schema.yaml"
+    schema_file: "fysxm_pinyin.schema.toml"

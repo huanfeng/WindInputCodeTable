@@ -1,0 +1,42 @@
+[schema]
+id = "tiger"
+name = "虎字"
+icon_label = "字"
+version = "1.0"
+author = "群友"
+description = "虎字秃版输入方案"
+
+[engine]
+type = "codetable"
+
+# 仅引擎固定参数；行为/调频/造词/临时拼音等用户可配项走全局 [schema.codetable] 与 [input.temp_pinyin]。
+[engine.codetable]
+max_code_length = 4
+base_sort = "weight"
+
+[[dictionaries]]
+id = "tiger_main"
+path = "tiger/tiger.dict.yaml"
+type = "rime_codetable"
+default = true
+
+[dictionaries.weight_spec]
+median = 10
+max = 890
+min = 5
+mode = "linear"
+
+[encoder]
+max_word_length = 10
+
+[[encoder.rules]]
+length_equal = 2
+formula = "AaAbBaBb"
+
+[[encoder.rules]]
+length_equal = 3
+formula = "AaBaCaCb"
+
+[[encoder.rules]]
+length_in_range = [4, 10]
+formula = "AaBaCaZa"
